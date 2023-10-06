@@ -22,10 +22,21 @@ const GameLoop = ({children, allCharactersData}) => {
     const moveMyCharacter = useCallback((e) => {
         var currentPosition = mycharacterData.position;
         const key = e.key;
+        console.log('Before move:', key,MY_CHARACTER_INIT_CONFIG.position);
+
         if (MOVE_DIRECTIONS[key]) {
             // ***********************************************
+            //caculate the position after move
+            //update MY_CHARACTER_INIT_CONFIG.position
+            //update redux store
             // TODO: Add your move logic here
+            var x = currentPosition.x + MOVE_DIRECTIONS[key][0];
+            var y = currentPosition.y + MOVE_DIRECTIONS[key][1];
+            var newPosition = {x: x, y: y};
+            MY_CHARACTER_INIT_CONFIG.position = newPosition;   
+            console.log('After move:', key,MY_CHARACTER_INIT_CONFIG.position,newPosition);
         }
+
     }, [mycharacterData]);
 
     const tick = useCallback(() => {
