@@ -5,8 +5,9 @@ import CanvasContext from './CanvasContext';
 import {MOVE_DIRECTIONS, MAP_DIMENSIONS, TILE_SIZE} from './mapConstants';
 import { MY_CHARACTER_INIT_CONFIG } from './characterConstants';
 import {checkMapCollision} from './utils';
+import {update as updateAllCharactersData} from './slices/allCharactersSlice'
 
-const GameLoop = ({children, allCharactersData}) => {
+const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
     const canvasRef = useRef(null);
     const [context, setContext] = useState(null);
     useEffect(() => {
@@ -22,19 +23,31 @@ const GameLoop = ({children, allCharactersData}) => {
     const moveMyCharacter = useCallback((e) => {
         var currentPosition = mycharacterData.position;
         const key = e.key;
-        console.log('Before move:', key,MY_CHARACTER_INIT_CONFIG.position);
 
         if (MOVE_DIRECTIONS[key]) {
             // ***********************************************
             //caculate the position after move
             //update MY_CHARACTER_INIT_CONFIG.position
-            //update redux store
             // TODO: Add your move logic here
-            var x = currentPosition.x + MOVE_DIRECTIONS[key][0];
-            var y = currentPosition.y + MOVE_DIRECTIONS[key][1];
-            var newPosition = {x: x, y: y};
-            MY_CHARACTER_INIT_CONFIG.position = newPosition;   
-            console.log('After move:', key,MY_CHARACTER_INIT_CONFIG.position,newPosition);
+            const [x, y] = MOVE_DIRECTIONS[key];
+            
+            if (!checkMapCollision(currentPosition.x + x, currentPosition.y + y)) {
+                const newPos = {
+                    x: currentPosition.x + x,
+                    y: currentPosition.y + y,
+                };
+
+                const updatedMyCharacterData = {
+                    ...mycharacterData,
+                    position: newPos,
+                };
+
+                const updatedUsersList = {
+                    ...allCharactersData,
+                };
+                updatedUsersList[MY_CHARACTER_INIT_CONFIG.id] = updatedMyCharacterData;
+                updateAllCharactersData(updatedUsersList);
+            }
         }
 
     }, [mycharacterData]);
@@ -77,4 +90,4 @@ const mapStateToProps = (state) => {
     return {allCharactersData: state.allCharacters.users};
 };
 
-export default connect(mapStateToProps, {})(GameLoop);
+export default connect(mapStateToProps, {updateAllCharactersData})(GameLoop);

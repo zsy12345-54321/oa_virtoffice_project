@@ -16,16 +16,11 @@ import { getDatabase } from "firebase/database";
 //   measurementId: "G-JDJCEPS4YH"
 // };
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_apiKey,
-    authDomain: process.env.REACT_APP_authDomain,
-    projectId: process.env.REACT_APP_projectId,
-    storageBucket: process.env.REACT_APP_storageBucket,
-    messagingSenderId: process.env.REACT_APP_messagingSenderId,
-    appId: process.env.REACT_APP_appId,
-    measurementId: process.env.REACT_APP_measurementId,
-    databaseURL: "https://oa-virtoffice-project-default-rtdb.firebaseio.com/",
+    apiKey: "AIzaSyDyixayvU8ZZerCQzuyRj5zvaMQH_DLSK4",
+    authDomain: "virtoffice-project.firebaseapp.com",
+    projectId: "virtoffice-project",
+    storageBucket: "virtoffice-project.appspot.com",
+    messagingSenderId: "767814147105",
+    appId: "1:767814147105:web:8c452c0136faca98a9d760",
+    measurementId: "G-VJNYZBMDNK"
   };
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-export const firebaseDatabase = getDatabase(firebaseApp);
