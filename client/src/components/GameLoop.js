@@ -6,6 +6,8 @@ import {MOVE_DIRECTIONS, MAP_DIMENSIONS, TILE_SIZE} from './mapConstants';
 import { MY_CHARACTER_INIT_CONFIG } from './characterConstants';
 import {checkMapCollision} from './utils';
 import {update as updateAllCharactersData} from './slices/allCharactersSlice'
+import{firebaseDatabase} from '../firebase/firebase';
+import {getDatabase, onValue, ref, set } from 'firebase/database';
 
 const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
     const canvasRef = useRef(null);
@@ -36,17 +38,33 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
                     x: currentPosition.x + x,
                     y: currentPosition.y + y,
                 };
-
                 const updatedMyCharacterData = {
                     ...mycharacterData,
                     position: newPos,
                 };
-
                 const updatedUsersList = {
                     ...allCharactersData,
                 };
-                updatedUsersList[MY_CHARACTER_INIT_CONFIG.id] = updatedMyCharacterData;
-                updateAllCharactersData(updatedUsersList);
+                //updatedUsersList[MY_CHARACTER_INIT_CONFIG.id] = updatedMyCharacterData;
+                //updateAllCharactersData(updatedUsersList);
+                
+                
+                /************* */
+
+                const posRef = ref(firebaseDatabase, 'users/' + MY_CHARACTER_INIT_CONFIG.id + '/position'); 
+                set(posRef, newPos);
+
+                onValue(posRef, (snapshot) => {
+                    const updatedMyCharacterData = snapshot.val();
+                    if (updatedMyCharacterData) {
+                        const updatedUsersList = {
+                            ...allCharactersData,
+                            [MY_CHARACTER_INIT_CONFIG.id]: updatedMyCharacterData,
+                        }
+                        updateAllCharactersData(updatedUsersList);
+                    }
+                  });
+            
             }
         }
 
