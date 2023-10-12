@@ -23,7 +23,7 @@ function MyCharacter({ myCharactersData, loadCharacter, updateAllCharactersData,
         // users[myId] = myInitData;
         // updateAllCharactersData(users);
         set(ref(firebaseDatabase, 'users/' + myId), myInitData);
-        
+        console.log("MyCharacter: useEffect: myInitData: ", myInitData);
     }, [webrtcSocket]);
 
     useEffect(() => {

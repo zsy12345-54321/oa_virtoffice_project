@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import CanvasContext from './CanvasContext';
 
 import {MOVE_DIRECTIONS, MAP_DIMENSIONS, TILE_SIZE} from './mapConstants';
-import { MY_CHARACTER_INIT_CONFIG } from './characterConstants';
+import {MY_CHARACTER_INIT_CONFIG } from './characterConstants';
 import {checkMapCollision} from './utils';
 import {update as updateAllCharactersData} from './slices/allCharactersSlice'
 import{firebaseDatabase} from '../firebase/firebase';
@@ -13,58 +13,36 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
     const canvasRef = useRef(null);
     const [context, setContext] = useState(null);
     useEffect(() => {
-        // frameCount used for re-rendering child components
+        //frameCount used for re-rendering child components
         console.log("initial setContext");
         setContext({canvas: canvasRef.current.getContext('2d'), frameCount: 0});
     }, [setContext]);
 
     // keeps the reference to the main rendering loop
     const loopRef = useRef();
-    const mycharacterData = allCharactersData[MY_CHARACTER_INIT_CONFIG.id];
-
+    const mycharacterData = firebaseDatabase[MY_CHARACTER_INIT_CONFIG.id];
+    //mycharacterData is null???
+    console.log("mycharacterData", firebaseDatabase);
     const moveMyCharacter = useCallback((e) => {
         var currentPosition = mycharacterData.position;
+        //error Cannot read properties of undefined (reading 'position') at HTMLDocument.<anonymous
         const key = e.key;
-
+        console.log("moveMyCharacter", key);
         if (MOVE_DIRECTIONS[key]) {
             // ***********************************************
             //caculate the position after move
             //update MY_CHARACTER_INIT_CONFIG.position
             // TODO: Add your move logic here
             const [x, y] = MOVE_DIRECTIONS[key];
-            
+            console.log("moveMyCharacter", currentPosition.x + x, currentPosition.y + y);
             if (!checkMapCollision(currentPosition.x + x, currentPosition.y + y)) {
                 const newPos = {
                     x: currentPosition.x + x,
                     y: currentPosition.y + y,
                 };
-                const updatedMyCharacterData = {
-                    ...mycharacterData,
-                    position: newPos,
-                };
-                const updatedUsersList = {
-                    ...allCharactersData,
-                };
-                //updatedUsersList[MY_CHARACTER_INIT_CONFIG.id] = updatedMyCharacterData;
-                //updateAllCharactersData(updatedUsersList);
-                
-                
-                /************* */
-
                 const posRef = ref(firebaseDatabase, 'users/' + MY_CHARACTER_INIT_CONFIG.id + '/position'); 
                 set(posRef, newPos);
-
-                onValue(posRef, (snapshot) => {
-                    const updatedMyCharacterData = snapshot.val();
-                    if (updatedMyCharacterData) {
-                        const updatedUsersList = {
-                            ...allCharactersData,
-                            [MY_CHARACTER_INIT_CONFIG.id]: updatedMyCharacterData,
-                        }
-                        updateAllCharactersData(updatedUsersList);
-                    }
-                  });
-            
+                console.log("moveMyCharacter",posRef, newPos);
             }
         }
 
@@ -90,6 +68,28 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
             document.removeEventListener('keypress', moveMyCharacter);
         }
     }, [moveMyCharacter]);
+
+    useEffect(() => {
+        const firebaseDatabase = getDatabase();
+        const posRef = ref(firebaseDatabase, 'users/' + MY_CHARACTER_INIT_CONFIG.id + '/position'); 
+
+        onValue(posRef, (snapshot) => {
+            const MyCharacterData = snapshot.val();
+            if (MyCharacterData) {
+                const updatedMyCharacterData = {
+                    ...mycharacterData,
+                    position: MyCharacterData,
+                };
+                const updatedUsersList = {
+                    ...firebaseDatabase,
+                }
+            updatedUsersList[MY_CHARACTER_INIT_CONFIG.id] = updatedMyCharacterData;
+            updateAllCharactersData(updatedUsersList);
+            console.log("update redux", MY_CHARACTER_INIT_CONFIG.id);
+            }
+        });
+      }, []);
+
 
     return (
         <CanvasContext.Provider value={context}>
