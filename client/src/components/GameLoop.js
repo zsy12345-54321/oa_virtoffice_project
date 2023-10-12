@@ -20,7 +20,7 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
 
     // keeps the reference to the main rendering loop
     const loopRef = useRef();
-    const mycharacterData = firebaseDatabase[MY_CHARACTER_INIT_CONFIG.id];
+    const mycharacterData = allCharactersData[MY_CHARACTER_INIT_CONFIG.id];
     //mycharacterData is null
     console.log("mycharacterData", firebaseDatabase);
     const moveMyCharacter = useCallback((e) => {
@@ -45,7 +45,6 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
                 console.log("moveMyCharacter",posRef, newPos);
             }
         }
-
     }, [mycharacterData]);
 
     const tick = useCallback(() => {
@@ -72,7 +71,6 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
     useEffect(() => {
         const firebaseDatabase = getDatabase();
         const posRef = ref(firebaseDatabase, 'users/' + MY_CHARACTER_INIT_CONFIG.id + '/position'); 
-
         onValue(posRef, (snapshot) => {
             const MyCharacterData = snapshot.val();
             if (MyCharacterData) {
