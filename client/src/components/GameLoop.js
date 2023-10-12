@@ -21,7 +21,7 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
     // keeps the reference to the main rendering loop
     const loopRef = useRef();
     const mycharacterData = firebaseDatabase[MY_CHARACTER_INIT_CONFIG.id];
-    //mycharacterData is null???
+    //mycharacterData is null
     console.log("mycharacterData", firebaseDatabase);
     const moveMyCharacter = useCallback((e) => {
         var currentPosition = mycharacterData.position;
