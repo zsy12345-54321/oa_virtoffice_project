@@ -8,6 +8,7 @@ import {checkMapCollision} from './utils';
 import {update as updateAllCharactersData} from './slices/allCharactersSlice'
 import{firebaseDatabase} from '../firebase/firebase';
 import {getDatabase, onValue, ref, set } from 'firebase/database';
+import FirebaseListener from './FirebaseListener';
 
 const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
     const canvasRef = useRef(null);
@@ -68,27 +69,6 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
         }
     }, [moveMyCharacter]);
 
-    useEffect(() => {
-        const firebaseDatabase = getDatabase();
-        const posRef = ref(firebaseDatabase, 'users/' + MY_CHARACTER_INIT_CONFIG.id + '/position'); 
-        onValue(posRef, (snapshot) => {
-            const MyCharacterData = snapshot.val();
-            if (MyCharacterData) {
-                const updatedMyCharacterData = {
-                    ...mycharacterData,
-                    position: MyCharacterData,
-                };
-                const updatedUsersList = {
-                    ...firebaseDatabase,
-                }
-            updatedUsersList[MY_CHARACTER_INIT_CONFIG.id] = updatedMyCharacterData;
-            updateAllCharactersData(updatedUsersList);
-            console.log("update redux", MY_CHARACTER_INIT_CONFIG.id);
-            }
-        });
-      }, []);
-
-
     return (
         <CanvasContext.Provider value={context}>
             <canvas
@@ -97,6 +77,7 @@ const GameLoop = ({children, allCharactersData,updateAllCharactersData}) => {
                 height={TILE_SIZE * MAP_DIMENSIONS.ROWS}
                 class="main-canvas"
             />
+            <FirebaseListener />
             {children}
         </CanvasContext.Provider>
     );
