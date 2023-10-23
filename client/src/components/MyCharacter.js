@@ -43,7 +43,7 @@ function MyCharacter({ myCharactersData, loadCharacter, updateAllCharactersData,
             CHARACTER_IMAGE_SIZE,
             CHARACTER_IMAGE_SIZE
         );
-        loadCharacter(true);
+         loadCharacter(true);
     }, [context, myCharactersData?.position.x, myCharactersData?.position.y, loadCharacter]);
 
     return null;
