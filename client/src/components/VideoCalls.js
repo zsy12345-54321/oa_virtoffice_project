@@ -13,11 +13,6 @@ function VideoCalls({myCharacterData, otherCharactersData, webrtcSocket}) {
     }, []);
 
     useEffect(() => {
-        console.log('webrtcSocket', webrtcSocket);
-        // rest of your code
-    }, [webrtcSocket]);
-
-    useEffect(() => {
         const handleReceiveOffer = ({callFromUserSocketId, offerSignal}) => {
             console.log('Received offer from:', callFromUserSocketId, 'Offer signal:', offerSignal);
         };
