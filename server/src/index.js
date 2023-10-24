@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 
 io.on("connection", (socket) => {
     socket.emit("me", socket.id);
-    socket.on('sendOffer', ({callToUserSocketId, callFromUserSocketId, offerSinal}) => {
+    socket.on('sendOffer', ({callToUserSocketId, callFromUserSocketId, offerSignal}) => {
         console.log("sending offer from", callFromUserSocketId, 'to', callToUserSocketId);
     });
 });

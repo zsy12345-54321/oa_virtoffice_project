@@ -5,14 +5,16 @@ import { MY_CHARACTER_INIT_CONFIG } from "./characterConstants";
 
 function VideoCalls({ myCharacterData, otherCharacterData , webrtcSocket}) {
     const [myStream, setMyStream] = useState();
+    console.log("VideoCallsA", myCharacterData, otherCharacterData);
     useEffect(() => {
-        console.log("VideoCalls", myCharacterData, otherCharacterData);
+        console.log("VideoCallsB", myCharacterData, otherCharacterData);
         navigator.mediaDevices.getUserMedia({video: true, audio: true})
         .then((stream) => {
             setMyStream(stream);
-            initializeVideoCall(stream, myCharacterData, otherCharacterData, webrtcSocket);
+            
         })
     },[]);
+    console.log("VideoCallsC", myCharacterData, otherCharacterData);
 
     const myUserId = myCharacterData?.id;
     const initializeVideoCall = Object.keys(otherCharacterData)
@@ -21,9 +23,11 @@ function VideoCalls({ myCharacterData, otherCharacterData , webrtcSocket}) {
             filteredObj[key] = otherCharacterData[key];
             return filteredObj;
         }, {});
+    console.log("VideoCallsD", myCharacterData, otherCharacterData, initializeVideoCall);
     return <>{
         myCharacterData && <div className="videos">
             {Object.keys(initializeVideoCall).map((otherUserId) => {
+                console.log("VideoCalls", initializeVideoCall[otherUserId]);
                 return <InitializeVideoCall
                     key={initializeVideoCall[otherUserId].socketId}
                     myUserId={myUserId}
@@ -35,18 +39,18 @@ function VideoCalls({ myCharacterData, otherCharacterData , webrtcSocket}) {
             </div>
     }</>;
 }
-
+  
 const mapStateToProps = (state) => {
     const myCharacterData = state.allCharacters[MY_CHARACTER_INIT_CONFIG.id];
     const otherCharacterData = Object.keys(state.allCharacters)
     .filter(id => id !== MY_CHARACTER_INIT_CONFIG.id)
     .reduce((filteredObj, key) => {
-        filteredObj[key] = state.allCharacters[key];
+        filteredObj[key] = state.allCharacters.users[key];
         return filteredObj;
     }, {});
     return {
-        myCharacterData,
-        otherCharacterData,
+        myCharacterData: myCharacterData,
+        otherCharacterData :otherCharacterData,
     };
 }
 
