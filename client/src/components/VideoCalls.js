@@ -1,57 +1,64 @@
-import React,{ useEffect, useRef, useState} from "react";
-import {connect} from 'react-redux';
+import React, {useEffect, useRef, useState} from "react";
 import InitializeVideoCall from "./InitializeVideoCall";
+import { Connect, connect } from "react-redux";
 import { MY_CHARACTER_INIT_CONFIG } from "./characterConstants";
 
-function VideoCalls({ myCharacterData, otherCharacterData , webrtcSocket}) {
+function VideoCalls({myCharacterData, otherCharactersData, webrtcSocket}) {
     const [myStream, setMyStream] = useState();
-    console.log("VideoCallsA", myCharacterData, otherCharacterData);
     useEffect(() => {
-        console.log("VideoCallsB", myCharacterData, otherCharacterData);
-        navigator.mediaDevices.getUserMedia({video: true, audio: true})
-        .then((stream) => {
+        console.log("ue");
+        navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream) => {
             setMyStream(stream);
-            
-        })
-    },[]);
-    console.log("VideoCallsC", myCharacterData, otherCharacterData);
+        });
+    }, []);
+
+    useEffect(() => {
+        console.log('webrtcSocket', webrtcSocket);
+        // rest of your code
+    }, [webrtcSocket]);
+
+    useEffect(() => {
+        const handleReceiveOffer = ({callFromUserSocketId, offerSignal}) => {
+            console.log('Received offer from:', callFromUserSocketId, 'Offer signal:', offerSignal);
+        };
+        webrtcSocket?.on('receiveOffer', handleReceiveOffer);
+        return () => {
+            webrtcSocket?.off('receiveOffer', handleReceiveOffer);
+        };
+    }, [webrtcSocket]);
+    
 
     const myUserId = myCharacterData?.id;
-    const initializeVideoCall = Object.keys(otherCharacterData)
-        .filter((otherUserId) => otherUserId >= myUserId)
-        .reduce((filteredObj, key) => {
-            filteredObj[key] = otherCharacterData[key];
-            return filteredObj;
-        }, {});
-    console.log("VideoCallsD", myCharacterData, otherCharacterData, initializeVideoCall);
+    const initiateCallToUsers = Object.keys(otherCharactersData)
+    .filter((othersUserId) => othersUserId !== myUserId)
+    .reduce((filterObj, key) => {
+        filterObj[key] = otherCharactersData[key];
+        return filterObj;
+    }, {});
+
     return <>{
         myCharacterData && <div className="videos">
-            {Object.keys(initializeVideoCall).map((otherUserId) => {
-                console.log("VideoCalls", initializeVideoCall[otherUserId]);
+            {Object.keys(initiateCallToUsers).map((othersUserId) => {
                 return <InitializeVideoCall
-                    key={initializeVideoCall[otherUserId].socketId}
-                    myUserId={myUserId}
-                    otherUserId={otherUserId}
-                    myStream={myStream}
-                    otherStream={initializeVideoCall[otherUserId].stream}
-                    webrtcSocket={webrtcSocket} />
+                key = {initiateCallToUsers[othersUserId].socketId}
+                mySocketId={myCharacterData.socketId}
+                myStream={myStream}
+                othersSocketedId={initiateCallToUsers[othersUserId].socketId}
+                webrtcSocket={webrtcSocket}/>
             })}
-            </div>
-    }</>;
-}
-  
-const mapStateToProps = (state) => {
-    const myCharacterData = state.allCharacters[MY_CHARACTER_INIT_CONFIG.id];
-    const otherCharacterData = Object.keys(state.allCharacters)
-    .filter(id => id !== MY_CHARACTER_INIT_CONFIG.id)
-    .reduce((filteredObj, key) => {
-        filteredObj[key] = state.allCharacters.users[key];
-        return filteredObj;
-    }, {});
-    return {
-        myCharacterData: myCharacterData,
-        otherCharacterData :otherCharacterData,
-    };
+        </div>
+    }</>
 }
 
-export default connect(mapStateToProps)(VideoCalls);
+const mapStateToProps = (state) => {
+    const myCharacterData = state.allCharacters.users[MY_CHARACTER_INIT_CONFIG.id];
+    const otherCharactersData = Object.keys(state.allCharacters.users)
+        .filter((id) => id !== MY_CHARACTER_INIT_CONFIG.id)
+        .reduce((filterObj, key) => {
+            filterObj[key] = state.allCharacters.users[key];
+            return filterObj;
+        }, {});
+    return {myCharacterData: myCharacterData, otherCharactersData: otherCharactersData};
+};
+
+export default connect(mapStateToProps, {})(VideoCalls);

@@ -3,6 +3,8 @@ import Peer from 'simple-peer';
 
 function InitializeVideoCall({mySocketId, myStream, othersSocketedId, webrtcSocket}) {
     const peerRef = useRef();
+    console.log("initializeVideoCall", InitializeVideoCall);
+
     const creatPeer = useCallback((othersSocketedId, mySocketId, myStream,webrtcSocket) => {
         const peer = new Peer({
             initiator: true,

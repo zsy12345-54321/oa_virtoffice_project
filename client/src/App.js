@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import GameLoop from './components/GameLoop';
 import Office from './components/Office';
 import VideoCalls from './components/VideoCalls';
+import MyVideo from './components/MyVideo';
 
 import './App.css';
 import { io } from 'socket.io-client';
@@ -24,6 +25,7 @@ function App() {
                 <Office webrtcSocket={WEBRTC_SOCKET}/>
               </GameLoop>
               <VideoCalls webrtcSocket={WEBRTC_SOCKET}/>
+              <MyVideo webrtcSocket={WEBRTC_SOCKET}/>
           </main>
         }
         <footer>
