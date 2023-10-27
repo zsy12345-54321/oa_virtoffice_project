@@ -1,26 +1,32 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Peer from 'simple-peer';
 
-function InitializeVideoCall({mySocketId, myStream, othersSocketedId, webrtcSocket}) {
+function InitializeVideoCall({mySocketId, myStream, othersSocketId, webrtcSocket}) {
     const peerRef = useRef();
     console.log("initializeVideoCall", InitializeVideoCall);
 
-    const creatPeer = useCallback((othersSocketedId, mySocketId, myStream,webrtcSocket) => {
+    const createPeer = useCallback((othersSocketId, mySocketId, myStream,webrtcSocket) => {
         const peer = new Peer({
             initiator: true,
             trickle: false,
             stream: myStream,
         });
         peer.on('signal', (signal) => {
-            console.log("creatPeer", signal);
-            webrtcSocket.emit('sendOffer', { callToUserSocketId: othersSocketedId, callFromUserSocketId: mySocketId, offerSignal: signal })
+            console.log("createPeer", signal);
+            webrtcSocket.emit('sendOffer', { callToUserSocketId: othersSocketId, callFromUserSocketId: mySocketId, offerSignal: signal })
         });
         return peer;
     },[]);
 
     useEffect(() => {
-        peerRef.current = creatPeer(othersSocketedId, mySocketId, myStream,webrtcSocket);
-    }, [mySocketId, myStream, othersSocketedId, webrtcSocket]);
+        peerRef.current = createPeer(othersSocketId, mySocketId, myStream,webrtcSocket);
+        webrtcSocket.on('sendAnswer', (payload) => {
+            console.log('Received answer from:', payload.callFromUserSocketId, 'Answer signal:', payload.answerSignal);
+            if (payload.callFromUserSocketId === othersSocketId) {
+                peerRef.current.signal(payload.answerSignal);
+            }
+        });
+    }, [mySocketId, myStream, othersSocketId, webrtcSocket]);
     return <></>;
 }
 
