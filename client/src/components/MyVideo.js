@@ -1,29 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback} from 'react';
 
-function MyVideo() {
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    async function getMedia() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (err) {
-        console.error('Error accessing media devices:', err);
-      }
-    }
-
-    getMedia();
-  }, []);
-
-  return (
-    <div>
-      <h1>My Video</h1>
-      <video ref={videoRef} autoPlay playsInline />
-    </div>
-  );
+function MyVideo({myStream}) {
+  const setVideoNode = useCallback(videoNode => {
+    videoNode && (videoNode.srcObject = myStream);
+}, [myStream]);
+  return<> 
+    {myStream && <video width= "320px" height="240px" autoPlay= "true" ref={setVideoNode} />}
+  </>
 }
 
 export default MyVideo;

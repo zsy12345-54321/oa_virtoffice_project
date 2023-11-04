@@ -5,6 +5,12 @@ function ReceivedVideoCall({mySocketId, myStream, othersSocketId, webrtcSocket, 
     const peerRef = useRef();
     const [othersStream, setOthersStream] = useState();
 
+    const setVideoStream = useCallback((videoNode) => {
+        if (videoNode) {
+            videoNode.srcObject = othersStream;
+        }
+    }, [othersStream]);
+
     const createPeer = useCallback((othersSocketId, mySocketId, myStream,webrtcSocket,offerSignal) => {
         const peer = new Peer({
             initiator: false,
@@ -21,8 +27,12 @@ function ReceivedVideoCall({mySocketId, myStream, othersSocketId, webrtcSocket, 
 
     useEffect(() => {
         peerRef.current = createPeer(othersSocketId, mySocketId, myStream,webrtcSocket,offerSignal);
+        peerRef.current.on('stream', (stream) => {setOthersStream(stream);});
+
     }, [mySocketId, myStream, othersSocketId, webrtcSocket]);
-    return <></>;
+    return <>
+        {othersStream && <video width= "320px" height="240px" autoPlay= "true" ref={setVideoStream} />}    
+    </>;
 }
 
 export default ReceivedVideoCall;

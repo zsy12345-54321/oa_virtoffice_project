@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import InitializeVideoCall from "./InitializeVideoCall";
 import ReceivedVideoCall from "./ReceivedVideoCall";
 import { Connect, connect } from "react-redux";
+import MyVideo from "./MyVideo";
 import { MY_CHARACTER_INIT_CONFIG } from "./characterConstants";
 
 function VideoCalls({myCharacterData, otherCharactersData, webrtcSocket}) {
@@ -37,6 +38,7 @@ function VideoCalls({myCharacterData, otherCharactersData, webrtcSocket}) {
 
     return <>{
         myCharacterData && <div className="videos">
+            <MyVideo myStream={myStream} />
             {Object.keys(initiateCallToUsers).map((othersUserId) => {
                 console.log("InitializeVideoCall", initiateCallToUsers[othersUserId]);
                 return <InitializeVideoCall
