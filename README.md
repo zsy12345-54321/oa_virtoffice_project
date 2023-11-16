@@ -40,6 +40,8 @@ npm run-serve build && serve -s build # Inside client directory
 ```
 
 # overall architecture:
+![Screenshot](https://github.com/zsy12345-54321/oa_virtoffice_project/blob/main/Screenshot%202023-11-15%20221031.png)
+
 Client Application (React):
 App.js: The main entry point of the React application. It manages the WebSocket connection and renders the main components like GameLoop, Office, and VideoCalls.
 CanvasContext.js: Provides a React context for the canvas, used across various components.
